@@ -1,12 +1,9 @@
 package demo.app.domain;
 
-import org.omg.CORBA.PUBLIC_MEMBER;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
-@Scope(value = "prototype")
-public class AutoTest {
+public class Properries {
 
 
 
@@ -17,9 +14,9 @@ public class AutoTest {
 
 
 
-	AutoTest(){}
+	Properries(){}
 
-	AutoTest(int b){
+	Properries(int b){
 		this.b = b;
 	}
 
