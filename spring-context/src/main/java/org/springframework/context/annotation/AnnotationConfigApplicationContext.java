@@ -61,6 +61,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	/**
 	 * Create a new AnnotationConfigApplicationContext that needs to be populated
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
+	 * 初始化 AnnotationConfigApplicationContext 上下文，然后刷新容器
+	 *
 	 */
 	public AnnotationConfigApplicationContext() {
 		this.reader = new AnnotatedBeanDefinitionReader(this);
@@ -84,8 +86,20 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
+		/* 1、初始化Spring 容器上下文
+		*   初始化 AnnotatedBeanDefinitionReader:注册所有相关的 注释后置处理器与公共后置处理器，以及
+		*
+		*    ClassPathBeanDefinitionScanner:1、注册默认的拦截器：@Component 注解以及包含该注解的注解
+	    */
 		this();
+		/*
+		 * 2、注册class，把加入的class，注册到Spring容器中
+		 */
 		register(componentClasses);
+
+		/*
+		 * 刷新容器 并且完成对象的创建
+		 */
 		refresh();
 	}
 
