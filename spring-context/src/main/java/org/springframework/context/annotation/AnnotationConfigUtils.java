@@ -61,6 +61,8 @@ public abstract class AnnotationConfigUtils {
 
 	/**
 	 * The bean name of the internally managed Configuration annotation processor.
+	 *
+	 * 内部管理Configuration 注解处理器的beanName（自定义）
 	 */
 	public static final String CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME =
 			"org.springframework.context.annotation.internalConfigurationAnnotationProcessor";
@@ -72,12 +74,16 @@ public abstract class AnnotationConfigUtils {
 	 * any custom name generation strategy available to the underlying
 	 * {@link ConfigurationClassPostProcessor}.
 	 * @since 3.1.1
+	 *
+	 * beanName生成管理器的bean名称
 	 */
 	public static final String CONFIGURATION_BEAN_NAME_GENERATOR =
 			"org.springframework.context.annotation.internalConfigurationBeanNameGenerator";
 
 	/**
 	 * The bean name of the internally managed Autowired annotation processor.
+	 *
+	 * 自动注入的后置处理器的bean名称
 	 */
 	public static final String AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME =
 			"org.springframework.context.annotation.internalAutowiredAnnotationProcessor";
@@ -85,6 +91,8 @@ public abstract class AnnotationConfigUtils {
 	/**
 	 * The bean name of the internally managed Required annotation processor.
 	 * @deprecated as of 5.1, since no Required processor is registered by default anymore
+	 *
+	 * 判断是否要求注入bean 的后置处理器的bean名称
 	 */
 	@Deprecated
 	public static final String REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME =
@@ -92,12 +100,14 @@ public abstract class AnnotationConfigUtils {
 
 	/**
 	 * The bean name of the internally managed JSR-250 annotation processor.
+	 * 管理JSR-250后置处理器的Bean名称
 	 */
 	public static final String COMMON_ANNOTATION_PROCESSOR_BEAN_NAME =
 			"org.springframework.context.annotation.internalCommonAnnotationProcessor";
 
 	/**
 	 * The bean name of the internally managed JPA annotation processor.
+	 * 管理JPA注解的后置处理器bean称
 	 */
 	public static final String PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME =
 			"org.springframework.context.annotation.internalPersistenceAnnotationProcessor";
@@ -107,12 +117,16 @@ public abstract class AnnotationConfigUtils {
 
 	/**
 	 * The bean name of the internally managed @EventListener annotation processor.
+	 *
+	 * 管理@EventListene注解后置处理器的bean名称
 	 */
 	public static final String EVENT_LISTENER_PROCESSOR_BEAN_NAME =
 			"org.springframework.context.event.internalEventListenerProcessor";
 
 	/**
 	 * The bean name of the internally managed EventListenerFactory.
+	 * 管理EventListenerFactory工程的的Bean名称
+	 *
 	 */
 	public static final String EVENT_LISTENER_FACTORY_BEAN_NAME =
 			"org.springframework.context.event.internalEventListenerFactory";
@@ -131,7 +145,15 @@ public abstract class AnnotationConfigUtils {
 
 	/**
 	 * Register all relevant annotation post processors in the given registry.
-	 * @param registry the registry to operate on
+	 *
+	 * 在给定的BeanDefinitionRegistry 实现中，注册所有先相关的 注释后置处理器
+	 * @see ConfigurationClassPostProcessor
+	 * @see AutowiredAnnotationBeanPostProcessor
+	 * @see CommonAnnotationBeanPostProcessor
+	 *
+	 *
+	 *
+	 *  @param registry the registry to operate on
 	 */
 	public static void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry) {
 		registerAnnotationConfigProcessors(registry, null);
@@ -140,7 +162,7 @@ public abstract class AnnotationConfigUtils {
 	/**
 	 * Register all relevant annotation post processors in the given registry.
 	 * @param registry the registry to operate on
-	 * @param source the configuration source element (already extracted)
+	 * @param source the configuration source element (already extracted[提取])
 	 * that this registration was triggered from. May be {@code null}.
 	 * @return a Set of BeanDefinitionHolders, containing all bean definitions
 	 * that have actually been registered by this call
