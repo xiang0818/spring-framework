@@ -515,12 +515,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
+			// 刷新前重置容器监听和events
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			// 刷新beanFactory
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
+			// 注册spring自身需要的组件
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -531,22 +534,26 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				// 注册实现了BeanPostProcessor 接口的类
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
+				// 初始化消息源
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
+				// 初始化特别上下文中的特殊属性
 				onRefresh();
 
 				// Check for listener beans and register them.
+				// 监听注册
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
-				//完成单例bean的实例化
+				// 完成所有剩余bean的实例化
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -597,6 +604,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
+		// 空实现
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
@@ -609,6 +617,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 		else {
 			// Reset local application listeners to pre-refresh state.
+			// 重置 earlyApplicationListeners
 			this.applicationListeners.clear();
 			this.applicationListeners.addAll(this.earlyApplicationListeners);
 		}
@@ -863,6 +872,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
+		// 需要先实例化 实现了LoadTimeWeaverAware接口的bean
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
 			getBean(weaverAwareName);
@@ -875,6 +885,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
+		// 实例化bean
 		beanFactory.preInstantiateSingletons();
 	}
 
