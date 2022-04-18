@@ -77,6 +77,13 @@ import org.springframework.web.util.UriTemplateHandler;
  * consider using the {@code org.springframework.web.reactive.client.WebClient}
  * which has a more modern API and supports sync, async, and streaming scenarios.
  *
+ *
+ * 同步客户端执行HTTP请求，公开一个简单的模板 基础HTTP客户端库（例如JDK）上的方法API
+ *   {@code HttpURLConnection}，Apache HttpComponents等。
+ * RestTemplate通过HTTP方法提供常见方案的模板，
+ * 在除了通用的{@code exchange}和{@code execute}方法之外，支持频率较低的案件。
+ *
+ *
  * @author Arjen Poutsma
  * @author Brian Clozel
  * @author Roy Clarkson

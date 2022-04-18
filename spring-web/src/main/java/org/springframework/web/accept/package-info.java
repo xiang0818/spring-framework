@@ -1,6 +1,6 @@
 /**
  * This package contains classes used to determine the requested the media types in a request.
- *
+ * 该程序包包含用于确定请求中请求的媒体类型的类
  * <p>{@link org.springframework.web.accept.ContentNegotiationStrategy} is the main
  * abstraction for determining requested {@linkplain org.springframework.http.MediaType media types}
  * with implementations based on

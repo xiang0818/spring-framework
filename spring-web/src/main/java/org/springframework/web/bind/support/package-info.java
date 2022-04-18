@@ -1,5 +1,6 @@
 /**
  * Support classes for web data binding.
+ * Web数据绑定的支持类。
  */
 @NonNullApi
 @NonNullFields

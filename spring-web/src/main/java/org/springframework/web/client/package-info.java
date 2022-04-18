@@ -1,6 +1,9 @@
 /**
  * Core package of the client-side web support.
  * Provides a RestTemplate class and various callback interfaces.
+ *
+ * 客户端Web支持的核心软件包
+ * 提供RestTemplate类和各种回调接口
  */
 @NonNullApi
 @NonNullFields
