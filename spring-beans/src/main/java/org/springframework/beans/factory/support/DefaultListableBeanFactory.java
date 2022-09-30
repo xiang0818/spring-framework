@@ -16,72 +16,30 @@
 
 package org.springframework.beans.factory.support;
 
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.TypeConverter;
+import org.springframework.beans.factory.*;
+import org.springframework.beans.factory.config.*;
+import org.springframework.core.OrderComparator;
+import org.springframework.core.ResolvableType;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.Nullable;
+import org.springframework.util.*;
+
+import javax.inject.Provider;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-
-import javax.inject.Provider;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.TypeConverter;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.BeanCurrentlyInCreationException;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
-import org.springframework.beans.factory.CannotLoadBeanClassException;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InjectionPoint;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.SmartFactoryBean;
-import org.springframework.beans.factory.SmartInitializingSingleton;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.config.DependencyDescriptor;
-import org.springframework.beans.factory.config.NamedBeanHolder;
-import org.springframework.core.OrderComparator;
-import org.springframework.core.ResolvableType;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.CompositeIterator;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * Spring's default implementation of the {@link ConfigurableListableBeanFactory}
@@ -1211,6 +1169,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 	}
 
+	/**
+	 *
+	 * 通过descriptor，当前BeanName，需要注入的Bean全限定，和类型转换器
+	 * @param descriptor         当前字段的描述
+	 * @param beanName           当前bean的名称
+	 * @param autowiredBeanNames 需要注入字段的beanName 列表
+	 * @param typeConverter      类型转换器
+	 * @return
+	 * @throws BeansException
+	 */
 	@Nullable
 	public Object doResolveDependency(DependencyDescriptor descriptor, @Nullable String beanName,
 									  @Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {
@@ -1241,12 +1209,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							converter.convertIfNecessary(value, type, descriptor.getMethodParameter()));
 				}
 			}
-
+			// 解析数组、集合、Map类型的
 			Object multipleBeans = resolveMultipleBeans(descriptor, beanName, autowiredBeanNames, typeConverter);
 			if (multipleBeans != null) {
 				return multipleBeans;
 			}
-
+			// 解析非数组、集合、Map类型的
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, type, descriptor);
 			if (matchingBeans.isEmpty()) {
 				if (isRequired(descriptor)) {
@@ -1257,22 +1225,27 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 			String autowiredBeanName;
 			Object instanceCandidate;
-
+			// 匹配结果大于1 ，ps：有多个实现类
 			if (matchingBeans.size() > 1) {
+				// 根据descriptor在matchingBeans中找到对应的bean的全限定名
 				autowiredBeanName = determineAutowireCandidate(matchingBeans, descriptor);
 				if (autowiredBeanName == null) {
+					// 没有找到，看看是不是有设置默认值，有的话直接发返回默认值
 					if (isRequired(descriptor) || !indicatesMultipleBeans(type)) {
 						return descriptor.resolveNotUnique(descriptor.getResolvableType(), matchingBeans);
 					} else {
+						//
 						// In case of an optional Collection/Map, silently ignore a non-unique case:
 						// possibly it was meant to be an empty collection of multiple regular beans
 						// (before 4.3 in particular when we didn't even look for collection beans).
 						return null;
 					}
 				}
+				// 在matchingBeans中获取到对象
 				instanceCandidate = matchingBeans.get(autowiredBeanName);
 			} else {
 				// We have exactly one match.
+				// 直接取第一个
 				Map.Entry<String, Object> entry = matchingBeans.entrySet().iterator().next();
 				autowiredBeanName = entry.getKey();
 				instanceCandidate = entry.getValue();
@@ -1320,6 +1293,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			return stream;
 		} else if (type.isArray()) {
+			// 1、确定此Class对象是否表示数组类。
 			Class<?> componentType = type.getComponentType();
 			ResolvableType resolvableType = descriptor.getResolvableType();
 			Class<?> resolvedArrayType = resolvableType.resolve(type);
@@ -1329,6 +1303,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (componentType == null) {
 				return null;
 			}
+			// 找到对应的对象
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, componentType,
 					new MultiElementDescriptor(descriptor));
 			if (matchingBeans.isEmpty()) {
@@ -1338,6 +1313,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				autowiredBeanNames.addAll(matchingBeans.keySet());
 			}
 			TypeConverter converter = (typeConverter != null ? typeConverter : getTypeConverter());
+			// 转换成需要的类型
 			Object result = converter.convertIfNecessary(matchingBeans.values(), resolvedArrayType);
 			if (result instanceof Object[]) {
 				Comparator<Object> comparator = adaptDependencyComparator(matchingBeans);
@@ -1347,6 +1323,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			return result;
 		} else if (Collection.class.isAssignableFrom(type) && type.isInterface()) {
+			//2、 是集合，并且是接口类型
 			Class<?> elementType = descriptor.getResolvableType().asCollection().resolveGeneric();
 			if (elementType == null) {
 				return null;
@@ -1369,6 +1346,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			return result;
 		} else if (Map.class == type) {
+			// 3、注入Map
 			ResolvableType mapType = descriptor.getResolvableType().asMap();
 			Class<?> keyType = mapType.resolveGeneric(0);
 			if (String.class != keyType) {
@@ -1428,6 +1406,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/**
 	 * Find bean instances that match the required type.
 	 * Called during autowiring for the specified bean.
+	 * 查找与所需类型匹配的 bean 实例。在指定 bean 的自动装配期间调用。
 	 *
 	 * @param beanName     the name of the bean that is about to be wired
 	 * @param requiredType the actual type of bean to look for
@@ -1510,6 +1489,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/**
 	 * Determine the autowire candidate in the given set of beans.
 	 * <p>Looks for {@code @Primary} and {@code @Priority} (in that order).
+	 * 确定给定 bean 集中的自动装配候选者。
 	 *
 	 * @param candidates a Map of candidate names and candidate instances
 	 *                   that match the required type, as returned by {@link #findAutowireCandidates}

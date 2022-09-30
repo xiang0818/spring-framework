@@ -66,6 +66,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ *
+ * 自动装配
  * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
  * that autowires annotated fields, setter methods and arbitrary config methods.
  * Such members to be injected are detected through a Java 5 annotation: by default,
@@ -592,6 +594,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 				Assert.state(beanFactory != null, "No BeanFactory available");
 				TypeConverter typeConverter = beanFactory.getTypeConverter();
 				try {
+					// 获取到需要设置的属性对象
 					value = beanFactory.resolveDependency(desc, beanName, autowiredBeanNames, typeConverter);
 				}
 				catch (BeansException ex) {
