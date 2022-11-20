@@ -39,7 +39,7 @@ ext {
     jackson2Version      = "2.9.9"
     jettyVersion         = "9.4.27.v20200227"
     junit5Version        = "5.3.2"
-    kotlinVersion        = "1.2.71"
+    kotlinVersion        = "1.6.10"
     log4jVersion         = "2.11.2"
     nettyVersion         = "4.1.48.Final"
     reactorVersion       = "Californium-SR17"
@@ -121,8 +121,8 @@ configure(allprojects) { project ->
         kotlinOptions {
             jvmTarget = "1.8"
             freeCompilerArgs = ["-Xjsr305=strict"]
-            apiVersion = "1.2"
-            languageVersion = "1.2"
+            apiVersion = "1.5"
+            languageVersion = "1.5"
         }
     }
 
